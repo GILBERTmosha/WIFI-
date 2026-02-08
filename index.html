@@ -3,49 +3,40 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MOSHARUTA WiFi - Management System</title>
+    <title>MOSHARUTA WiFi - Multi-Device Sync</title>
     <style>
-        :root { --primary: #22d3ee; --bg: #0f172a; --card: #1e293b; --danger: #f43f5e; --success: #10b981; --edit: #eab308; }
+        :root { --primary: #22d3ee; --bg: #0f172a; --card: #1e293b; --danger: #f43f5e; --success: #10b981; }
         body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: #f8fafc; margin: 0; padding: 10px; }
-        .container { max-width: 600px; margin: auto; background: var(--card); padding: 20px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); border: 1px solid #334155; }
+        .container { max-width: 500px; margin: auto; background: var(--card); padding: 20px; border-radius: 20px; border: 1px solid #334155; }
         .hidden { display: none; }
-        
         .menu { display: flex; justify-content: space-around; margin-bottom: 20px; border-bottom: 2px solid #334155; }
         .menu button { background: none; border: none; color: #94a3b8; padding: 10px; cursor: pointer; font-weight: bold; font-size: 11px; }
         .menu button.active { color: var(--primary); border-bottom: 3px solid var(--primary); }
-
-        input { width: 100%; padding: 12px; margin: 8px 0; border-radius: 10px; border: 1px solid #334155; background: #0f172a; color: white; box-sizing: border-box; outline: none; }
-        .btn { width: 100%; padding: 12px; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; margin-top: 5px; transition: 0.2s; }
+        input, textarea { width: 100%; padding: 12px; margin: 8px 0; border-radius: 10px; border: 1px solid #334155; background: #0f172a; color: white; box-sizing: border-box; }
+        .btn { width: 100%; padding: 12px; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; margin-top: 5px; }
         .btn-save { background: var(--success); color: white; }
-        .btn-update { background: var(--edit); color: black; }
-        
         table { width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 10px; }
         th, td { padding: 8px; text-align: left; border-bottom: 1px solid #334155; }
-        .total-box { background: #064e3b; padding: 12px; border-radius: 10px; text-align: center; margin-top: 15px; font-size: 18px; color: #34d399; font-weight: bold; }
-        
-        .action-container { display: flex; gap: 4px; }
-        .action-icon { cursor: pointer; font-size: 16px; background: none; border: none; padding: 0; }
-        .backup-section { background: #0f172a; padding: 15px; border-radius: 15px; margin-top: 20px; border: 1px dashed var(--primary); text-align: center; }
+        .backup-area { background: #020617; padding: 15px; border-radius: 15px; border: 1px dashed var(--primary); margin-top: 20px; }
+        .copy-box { background: #1e293b; padding: 10px; font-size: 10px; overflow-wrap: break-word; color: #34d399; margin-bottom: 10px; border-radius: 5px; max-height: 100px; overflow-y: auto; }
     </style>
 </head>
 <body>
 
 <div class="container">
     <div id="login-section">
-        <h2 style="text-align:center">📡 MOSHARUTA ACCESS</h2>
-        <input type="email" id="emailIn" placeholder="Weka Email Yako">
+        <h2 style="text-align:center">📡 MOSHARUTA SYNC</h2>
+        <input type="email" id="emailIn" placeholder="Email yako">
         <input type="password" id="passIn" placeholder="Password">
         <button class="btn btn-save" onclick="handleLogin()">INGIA</button>
     </div>
 
     <div id="main-content" class="hidden">
-        <div style="text-align:center; margin-bottom:10px;"><small id="userLabel"></small></div>
-        
         <div class="menu">
             <button id="tab1" class="active" onclick="switchTab('calc')">CALC</button>
             <button id="tab2" onclick="switchTab('entry')">SAJILI</button>
             <button id="tab3" onclick="switchTab('list')">MAUZO</button>
-            <button id="tab4" class="hidden" onclick="switchTab('admin')">ADMIN VIEW</button>
+            <button id="tab4" class="hidden" onclick="switchTab('admin')">ADMIN</button>
         </div>
 
         <div id="calc-section">
@@ -72,64 +63,49 @@
         </div>
 
         <div id="entry-section" class="hidden">
-            <h3 id="formHeader">📝 Sajili Malipo Mpya</h3>
-            <input type="hidden" id="editIndex" value="-1">
+            <h3>📝 Sajili Mauzo</h3>
             <input type="text" id="mName" placeholder="Jina la Mteja">
-            <input type="text" id="mPhone" placeholder="Namba ya Simu">
             <input type="number" id="mAmount" placeholder="Kiasi (Tsh)">
-            <button id="saveBtn" class="btn btn-save" onclick="saveRecord()">HIFADHI</button>
-            <button id="cancelEditBtn" class="btn hidden" style="background:#475569" onclick="resetForm()">GHAIRI</button>
+            <button class="btn btn-save" onclick="saveRecord()">HIFADHI</button>
         </div>
 
         <div id="list-section" class="hidden">
-            <h4>Mauzo Yako Leo</h4>
+            <h4>Mauzo Yako</h4>
             <div id="userList"></div>
-            <div class="total-box">JUMLA: <span id="userTotal">0</span> /=</div>
-
-            <div class="backup-section">
-                <p style="font-size:11px; margin-bottom:10px;">🔐 <b>USER BACKUP SYSTEM</b></p>
-                <div id="uBackupCodeDisp" style="color:var(--primary); font-family:monospace; margin-bottom:10px;">CODE: ----</div>
-                <button class="btn" style="background:#334155; font-size:10px; width:45%;" onclick="genUserBackup()">TENGENEZA CODE</button>
-                <button class="btn" style="background:#1e293b; border:1px solid var(--primary); font-size:10px; width:45%;" onclick="restoreUserBackup()">RUDISHA DATA</button>
+            
+            <div class="backup-area">
+                <p style="font-size:12px; color:var(--primary); font-weight:bold;">📲 HAMISHA DATA KWENDA SIMU NYINGINE</p>
+                <div id="copyBox" class="copy-box">Code itatokea hapa...</div>
+                <button class="btn" style="background:#334155; font-size:11px;" onclick="generateExportCode()">1. TENGENEZA CODE YA KUHAMISHA</button>
+                <hr style="border:0.5px solid #334155; margin:15px 0;">
+                <textarea id="importCode" placeholder="Paste code hapa kutoka simu nyingine..." rows="3"></textarea>
+                <button class="btn" style="background:var(--primary); color:black; font-size:11px;" onclick="importData()">2. RUDISHA DATA KWA CODE HII</button>
             </div>
         </div>
 
         <div id="admin-section" class="hidden">
-            <h3 style="color:var(--danger)">👑 Admin Dashboard (Kingshamo)</h3>
-            <table>
-                <thead>
-                    <tr><th>User</th><th>Mteja</th><th>Tsh</th><th>Action</th></tr>
-                </thead>
-                <tbody id="adminTable"></tbody>
-            </table>
-            <div class="total-box">JUMLA KUU: <span id="grandTotal">0</span> /=</div>
+            <h3>👑 Admin View</h3>
+            <div id="adminData"></div>
         </div>
 
-        <button class="btn" style="background:#475569; margin-top:30px" onclick="location.reload()">LOGOUT</button>
+        <button class="btn" style="background:#475569; margin-top:20px" onclick="location.reload()">LOGOUT</button>
     </div>
 </div>
 
 <script>
-    const _ADMIN_EMAIL = "kingshamo47@gmail.com";
-    const _ADMIN_PASS = "2007+";
-    const _USER_PASS = "MOSHA";
-
+    const ADM_E = "kingshamo47@gmail.com";
+    const ADM_P = "2007+";
+    const USR_P = "MOSHA";
     let currentUser = "";
-    let isAdminUser = false;
 
     function handleLogin() {
         let e = document.getElementById('emailIn').value.trim();
         let p = document.getElementById('passIn').value.trim();
-        if (e === _ADMIN_EMAIL && p === _ADMIN_PASS) {
-            isAdminUser = true; currentUser = e;
-            document.getElementById('tab4').classList.remove('hidden');
-        } else if (e && p === _USER_PASS) {
-            isAdminUser = false; currentUser = e;
-        } else { return alert("Ingiza Email sahihi na Password!"); }
-        
+        if(e === ADM_E && p === ADM_P) { currentUser = e; document.getElementById('tab4').classList.remove('hidden'); }
+        else if(e && p === USR_P) { currentUser = e; }
+        else { return alert("Login imekataa!"); }
         document.getElementById('login-section').classList.add('hidden');
         document.getElementById('main-content').classList.remove('hidden');
-        document.getElementById('userLabel').innerHTML = `Login: <b>${currentUser}</b>`;
         switchTab('calc');
     }
 
@@ -137,127 +113,74 @@
         ['calc-section', 'entry-section', 'list-section', 'admin-section'].forEach(s => document.getElementById(s).classList.add('hidden'));
         document.getElementById(t + '-section').classList.remove('hidden');
         if(t === 'list') renderUserList();
-        if(t === 'admin') renderAdminTable();
+        if(t === 'admin') renderAdminView();
     }
 
-    // Calculator logic
     let expr = "";
     function press(v) { expr += v; document.getElementById('display').value = expr; }
     function clearC() { expr = ""; document.getElementById('display').value = ""; }
     function calcResult() { try { expr = eval(expr).toString(); document.getElementById('display').value = expr; } catch { clearC(); } }
 
-    // Data handling
     function saveRecord() {
-        let m = document.getElementById('mName').value, n = document.getElementById('mPhone').value, a = document.getElementById('mAmount').value;
-        let eIdx = parseInt(document.getElementById('editIndex').value);
-        if(!m || !a) return alert("Jaza jina na kiasi!");
-
-        let db = JSON.parse(localStorage.getItem('mosha_cloud_v7')) || [];
-        if(eIdx > -1) {
-            db[eIdx].mteja = m; db[eIdx].namba = n; db[eIdx].kiasi = parseFloat(a);
-            alert("Imerekebishwa!");
-        } else {
-            db.push({ user: currentUser, mteja: m, namba: n, kiasi: parseFloat(a), date: new Date().toLocaleDateString() });
-            alert("Imehifadhiwa!");
-        }
-        localStorage.setItem('mosha_cloud_v7', JSON.stringify(db));
-        resetForm(); switchTab('list');
-    }
-
-    function resetForm() {
-        document.getElementById('mName').value = ''; document.getElementById('mPhone').value = ''; document.getElementById('mAmount').value = '';
-        document.getElementById('editIndex').value = "-1";
-        document.getElementById('formHeader').innerText = "📝 Sajili Malipo Mpya";
-        document.getElementById('saveBtn').innerText = "HIFADHI";
-        document.getElementById('saveBtn').className = "btn btn-save";
-        document.getElementById('cancelEditBtn').classList.add('hidden');
-    }
-
-    function startEdit(idx) {
-        let db = JSON.parse(localStorage.getItem('mosha_cloud_v7'));
-        let item = db[idx];
-        document.getElementById('mName').value = item.mteja;
-        document.getElementById('mPhone').value = item.namba;
-        document.getElementById('mAmount').value = item.kiasi;
-        document.getElementById('editIndex').value = idx;
-        document.getElementById('formHeader').innerText = "✏️ Hariri Mauzo";
-        document.getElementById('saveBtn').innerText = "UPDATE";
-        document.getElementById('saveBtn').className = "btn btn-update";
-        document.getElementById('cancelEditBtn').classList.remove('hidden');
-        switchTab('entry');
-    }
-
-    function sendMessage(type, phone, name, amount) {
-        let msg = `Habari ${name}, Asante kwa malipo ya MOSHARUTA WiFi: Tsh ${amount.toLocaleString()}. Karibu tena!`;
-        if(type === 'wa') {
-            let n = phone.startsWith('0') ? '255' + phone.substring(1) : phone;
-            window.open(`https://wa.me/${n}?text=${encodeURIComponent(msg)}`, '_blank');
-        } else {
-            let sep = (navigator.userAgent.toLowerCase().indexOf("iphone") > -1) ? "&" : "?";
-            window.location.href = `sms:${phone}${sep}body=${encodeURIComponent(msg)}`;
-        }
+        let m = document.getElementById('mName').value, a = document.getElementById('mAmount').value;
+        if(!m || !a) return alert("Jaza Jina na Kiasi!");
+        let db = JSON.parse(localStorage.getItem('mosha_v9')) || [];
+        db.push({ u: currentUser, mteja: m, kiasi: parseFloat(a), date: new Date().toLocaleString() });
+        localStorage.setItem('mosha_v9', JSON.stringify(db));
+        alert("Imetunzwa!");
+        document.getElementById('mName').value = ''; document.getElementById('mAmount').value = '';
+        switchTab('list');
     }
 
     function renderUserList() {
-        let db = JSON.parse(localStorage.getItem('mosha_cloud_v7')) || [];
-        let myData = db.map((d, i) => ({...d, id: i})).filter(x => x.user === currentUser);
-        let h = "<table><thead><tr><th>Mteja</th><th>Kiasi</th><th>Tuma</th></tr></thead><tbody>";
-        let total = 0;
-        myData.forEach(d => {
-            h += `<tr><td>${d.mteja}</td><td>${d.kiasi.toLocaleString()}</td>
-            <td><div class="action-container">
-                <button class="action-icon" onclick="startEdit(${d.id})">✏️</button>
-                <button class="action-icon" onclick="sendMessage('sms','${d.namba}','${d.mteja}',${d.kiasi})">🔵</button>
-                <button class="action-icon" onclick="sendMessage('wa','${d.namba}','${d.mteja}',${d.kiasi})">🟢</button>
-            </div></td></tr>`;
-            total += d.kiasi;
-        });
-        h += "</tbody></table>";
-        document.getElementById('userList').innerHTML = h;
-        document.getElementById('userTotal').innerText = total.toLocaleString();
+        let db = JSON.parse(localStorage.getItem('mosha_v9')) || [];
+        let myData = db.filter(x => x.u === currentUser);
+        let h = "<table><tr><th>Mteja</th><th>Tsh</th></tr>";
+        myData.forEach(d => { h += `<tr><td>${d.mteja}</td><td>${d.kiasi.toLocaleString()}</td></tr>`; });
+        document.getElementById('userList').innerHTML = h + "</table>";
     }
 
-    function renderAdminTable() {
-        let db = JSON.parse(localStorage.getItem('mosha_cloud_v7')) || [];
-        let html = ""; let grand = 0;
-        db.forEach((d, i) => {
-            html += `<tr><td><small>${d.user.split('@')[0]}</small></td><td>${d.mteja}</td><td>${d.kiasi.toLocaleString()}</td>
-            <td><button class="action-icon" onclick="adminDel(${i})">🗑️</button></td></tr>`;
-            grand += d.kiasi;
-        });
-        document.getElementById('adminTable').innerHTML = html;
-        document.getElementById('grandTotal').innerText = grand.toLocaleString();
+    function renderAdminView() {
+        let db = JSON.parse(localStorage.getItem('mosha_v9')) || [];
+        let h = "<table><tr><th>User</th><th>Mteja</th><th>Tsh</th></tr>";
+        db.forEach(d => { h += `<tr><td>${d.u.split('@')[0]}</td><td>${d.mteja}</td><td>${d.kiasi.toLocaleString()}</td></tr>`; });
+        document.getElementById('adminData').innerHTML = h + "</table>";
     }
 
-    function adminDel(i) {
-        if(confirm("Admin: Futa rekodi hii?")) {
-            let db = JSON.parse(localStorage.getItem('mosha_cloud_v7'));
-            db.splice(i, 1);
-            localStorage.setItem('mosha_cloud_v7', JSON.stringify(db));
-            renderAdminTable();
+    // --- Mfumo wa Kuhamisha Data (Simu kwa Simu) ---
+    function generateExportCode() {
+        let db = localStorage.getItem('mosha_v9');
+        if(!db || db === "[]") return alert("Hakuna data za kuhamisha!");
+        
+        // Tunageuza data kuwa string ambayo unaweza ku-copy
+        let exportData = btoa(unescape(encodeURIComponent(db))); 
+        document.getElementById('copyBox').innerText = exportData;
+        
+        // Rahisisha kwa ku-copy moja kwa moja
+        navigator.clipboard.writeText(exportData).then(() => {
+            alert("Code imetengenezwa na imekuwa Copied! Sasa itume WhatsApp kwenda simu nyingine.");
+        });
+    }
+
+    function importData() {
+        let code = document.getElementById('importCode').value.trim();
+        if(!code) return alert("Paste code hapa kwanza!");
+        
+        try {
+            let decodedData = decodeURIComponent(escape(atob(code)));
+            let parsed = JSON.parse(decodedData);
+            
+            if(confirm("Je, unataka kuongeza data hizi kwenye simu hii?")) {
+                let existingDb = JSON.parse(localStorage.getItem('mosha_v9')) || [];
+                let finalDb = [...existingDb, ...parsed]; // Inaunganisha data za zamani na mpya
+                localStorage.setItem('mosha_v9', JSON.stringify(finalDb));
+                alert("Data zimehamishwa kikamilifu!");
+                renderUserList();
+                document.getElementById('importCode').value = "";
+            }
+        } catch(e) {
+            alert("Code siyo sahihi! Hakikisha ume-copy code yote uliyotengeneza kwenye simu ya kwanza.");
         }
-    }
-
-    // Backup Systems
-    function genUserBackup() {
-        let db = JSON.parse(localStorage.getItem('mosha_cloud_v7')) || [];
-        let myData = db.filter(x => x.user === currentUser);
-        if(myData.length === 0) return alert("Huna data za kufanyia backup!");
-        let code = "MS-" + Math.floor(1000 + Math.random() * 9000);
-        localStorage.setItem('backup_' + code, JSON.stringify(myData));
-        document.getElementById('uBackupCodeDisp').innerText = "CODE: " + code;
-        alert("Backup Imetengenezwa! Itunze Code hii: " + code);
-    }
-
-    function restoreUserBackup() {
-        let code = prompt("Ingiza Backup Code yako:");
-        let data = localStorage.getItem('backup_' + code);
-        if(data) {
-            let db = JSON.parse(localStorage.getItem('mosha_cloud_v7')) || [];
-            let restored = JSON.parse(data);
-            localStorage.setItem('mosha_cloud_v7', JSON.stringify([...db, ...restored]));
-            alert("Data zimerudishwa!"); renderUserList();
-        } else { alert("Code imekosewa!"); }
     }
 </script>
 </body>
