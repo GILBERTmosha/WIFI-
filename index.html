@@ -1,23 +1,4 @@
-<!DOCTYPE html>
-<html lang="sw">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MOSHARUTH WiFi System</title>
-    <style>
-        body { font-family: 'Segoe UI', sans-serif; background: #0f172a; color: #f8fafc; margin: 0; padding: 10px; }
-        .container { max-width: 550px; margin: auto; background: #1e293b; padding: 20px; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); }
-        .hidden { display: none; }
-        
-        .menu { display: flex; justify-content: space-around; margin-bottom: 20px; border-bottom: 2px solid #334155; }
-        .menu button { background: none; border: none; color: #94a3b8; padding: 10px; cursor: pointer; font-weight: bold; font-size: 14px; }
-        .menu button.active { color: #22d3ee; border-bottom: 3px solid #22d3ee; }
-
-        #display { width: 100%; height: 60px; background: #0f172a; color: #22d3ee; border: none; border-radius: 8px; margin-bottom: 10px; text-align: right; padding: 15px; font-size: 24px; font-family: monospace; box-sizing: border-box; }
-        .calc-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
-        .calc-grid button { padding: 18px; border: none; border-radius: 8px; font-size: 18px; cursor: pointer; background: #334155; color: white; }
-        .btn-op { background: #0ea5e9 !important; }
-        .btn-eq { background: #10b981 !important; grid-column: span 2; }
+1 !important; grid-column: span 2; }
         .btn-clr { background: #ef4444 !important; }
 
         label { display: block; margin-top: 10px; color: #94a3b8; font-size: 14px; }
@@ -219,6 +200,244 @@
         document.getElementById('form-title').innerText = "📝 Sajili Mteja Mpya";
         document.getElementById('btn-save').classList.remove('hidden');
         document.getElementById('btn-update').classList.add('hidden');
+    }
+</script>
+</body>
+</html>
+<!DOCTYPE html>
+<html lang="sw">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MOSHARUTH WiFi - SMS & WA Support</title>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; background: #0f172a; color: #f8fafc; margin: 0; padding: 10px; }
+        .container { max-width: 500px; margin: auto; background: #1e293b; padding: 20px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        .hidden { display: none; }
+        
+        .menu { display: flex; justify-content: space-around; margin-bottom: 20px; border-bottom: 2px solid #334155; }
+        .menu button { background: none; border: none; color: #94a3b8; padding: 10px; cursor: pointer; font-weight: bold; }
+        .menu button.active { color: #22d3ee; border-bottom: 3px solid #22d3ee; }
+
+        input, textarea { width: 100%; padding: 12px; margin: 8px 0; border-radius: 10px; border: 1px solid #334155; background: #0f172a; color: white; box-sizing: border-box; }
+        .btn { width: 100%; padding: 12px; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; margin-top: 5px; transition: 0.3s; }
+        .btn-save { background: #10b981; color: white; }
+        .btn-update { background: #f59e0b; color: white; }
+        .btn-backup { background: #6366f1; color: white; }
+        
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 13px; }
+        th, td { padding: 10px; text-align: left; border-bottom: 1px solid #334155; }
+        .total-box { background: #064e3b; padding: 15px; border-radius: 10px; text-align: center; margin-top: 15px; font-size: 20px; color: #34d399; font-weight: bold; }
+        
+        .action-btn { background: none; border: none; font-size: 18px; cursor: pointer; margin-right: 2px; }
+        .badge { font-size: 10px; padding: 2px 5px; border-radius: 4px; color: white; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div id="login-section">
+        <h2 style="text-align:center">📡 MOSHARUTH SYSTEM</h2>
+        <input type="password" id="secretCode" placeholder="Ingiza Password...">
+        <button class="btn btn-save" style="background:#0ea5e9" onclick="checkCode()">FUNGUA</button>
+    </div>
+
+    <div id="main-content" class="hidden">
+        <div class="menu">
+            <button id="tab1" class="active" onclick="showTab('calc')">CALC</button>
+            <button id="tab2" onclick="showTab('entry')">SAJILI</button>
+            <button id="tab3" onclick="showTab('list')">LISTI</button>
+            <button id="tab4" onclick="showTab('backup')">SIRI</button>
+        </div>
+
+        <div id="calc-section">
+            <input type="text" id="display" style="text-align:right; font-size:28px;" placeholder="0" readonly>
+            <div style="display:grid; grid-template-columns: repeat(4, 1fr); gap:10px;">
+                <button class="btn" onclick="clearCalc()" style="background:#ef4444">C</button>
+                <button class="btn" onclick="press('/')" style="background:#334155">/</button>
+                <button class="btn" onclick="press('*')" style="background:#334155">×</button>
+                <button class="btn" onclick="press('-')" style="background:#334155">-</button>
+                <button class="btn" onclick="press('7')" style="background:#475569">7</button>
+                <button class="btn" onclick="press('8')" style="background:#475569">8</button>
+                <button class="btn" onclick="press('9')" style="background:#475569">9</button>
+                <button class="btn" onclick="press('+')" style="background:#334155">+</button>
+                <button class="btn" onclick="press('1')" style="background:#475569">1</button>
+                <button class="btn" onclick="press('2')" style="background:#475569">2</button>
+                <button class="btn" onclick="press('3')" style="background:#475569">3</button>
+                <button class="btn" onclick="calculate()" style="background:#10b981; grid-row: span 2">=</button>
+                <button class="btn" onclick="press('0')" style="grid-column: span 2; background:#475569">0</button>
+                <button class="btn" onclick="press('.')">.</button>
+            </div>
+        </div>
+
+        <div id="entry-section" class="hidden">
+            <h3 id="formTitle">📝 Sajili Mteja</h3>
+            <input type="hidden" id="editIndex">
+            <input type="text" id="mteja" placeholder="Jina la Mteja">
+            <input type="text" id="namba" placeholder="Namba (Mfano: 07...)">
+            <input type="number" id="kiasi" placeholder="Kiasi (Tsh)">
+            <button id="saveBtn" class="btn btn-save" onclick="saveData()">HIFADHI DATA</button>
+            <button id="updateBtn" class="btn btn-update hidden" onclick="updateData()">UPDATE DATA</button>
+        </div>
+
+        <div id="list-section" class="hidden">
+            <input type="text" id="search" placeholder="🔍 Tafuta..." onkeyup="showData()">
+            <table>
+                <thead><tr><th>Mteja</th><th>Kiasi</th><th>Ujumbe</th></tr></thead>
+                <tbody id="dataBody"></tbody>
+            </table>
+            <div class="total-box">JUMLA: <span id="jumlaKuu">0</span> /=</div>
+        </div>
+
+        <div id="backup-section" class="hidden">
+            <div id="pin-prompt">
+                <input type="password" id="inputPin" placeholder="PIN ya Siri (2007)">
+                <button class="btn btn-backup" onclick="unlockBackup()">FUNGUA SIRI</button>
+            </div>
+            <div id="backup-content" class="hidden">
+                <button class="btn btn-backup" onclick="generateBackup()">GET BACKUP CODE</button>
+                <textarea id="backupCode" readonly></textarea>
+                <button class="btn" style="background:#ef4444" onclick="clearAllData()">🗑️ FUTA DATA ZOTE</button>
+                <hr>
+                <p>Rudisha Data:</p>
+                <textarea id="restoreInput" placeholder="Bandika code hapa..."></textarea>
+                <button class="btn btn-save" onclick="restoreData()">RESTORE</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const SIRI = "MOSHARUTH";
+    const PIN_BACKUP = "2007";
+
+    function checkCode() {
+        if(document.getElementById('secretCode').value === SIRI) {
+            document.getElementById('login-section').classList.add('hidden');
+            document.getElementById('main-content').classList.remove('hidden');
+        } else { alert("Login failed!"); }
+    }
+
+    function showTab(tab) {
+        ['calc-section', 'entry-section', 'list-section', 'backup-section'].forEach(s => document.getElementById(s).classList.add('hidden'));
+        document.getElementById(tab + '-section').classList.remove('hidden');
+        if(tab === 'list') showData();
+    }
+
+    // Calc
+    let expr = "";
+    function press(v) { expr += v; document.getElementById('display').value = expr; }
+    function clearCalc() { expr = ""; document.getElementById('display').value = ""; }
+    function calculate() { try { expr = eval(expr).toString(); document.getElementById('display').value = expr; } catch { clearCalc(); } }
+
+    // Data
+    function saveData() {
+        let m = document.getElementById('mteja').value, n = document.getElementById('namba').value, k = document.getElementById('kiasi').value;
+        if(!m || !k) return alert("Jaza Jina na Kiasi!");
+        let data = JSON.parse(localStorage.getItem('wifiData')) || [];
+        data.push({ mteja:m, namba:n, kiasi:parseFloat(k), tarehe:new Date().toLocaleDateString() });
+        localStorage.setItem('wifiData', JSON.stringify(data));
+        resetForm();
+        showTab('list');
+    }
+
+    function showData() {
+        let data = JSON.parse(localStorage.getItem('wifiData')) || [];
+        let s = document.getElementById('search').value.toLowerCase();
+        let h = ""; let t = 0;
+        data.forEach((item, i) => {
+            if(item.mteja.toLowerCase().includes(s)) {
+                h += `<tr>
+                    <td>${item.mteja}<br><small>${item.tarehe}</small></td>
+                    <td>${item.kiasi.toLocaleString()}</td>
+                    <td>
+                        <button class="action-btn" title="Edit" onclick="editData(${i})">📝</button>
+                        <button class="action-btn" title="SMS" onclick="sendSMS(${i})">🔵</button>
+                        <button class="action-btn" title="WhatsApp" onclick="sendWA(${i})">🟢</button>
+                    </td>
+                </tr>`;
+                t += item.kiasi;
+            }
+        });
+        document.getElementById('dataBody').innerHTML = h;
+        document.getElementById('jumlaKuu').innerText = t.toLocaleString();
+    }
+
+    function editData(i) {
+        let data = JSON.parse(localStorage.getItem('wifiData'));
+        let item = data[i];
+        document.getElementById('mteja').value = item.mteja;
+        document.getElementById('namba').value = item.namba;
+        document.getElementById('kiasi').value = item.kiasi;
+        document.getElementById('editIndex').value = i;
+        document.getElementById('formTitle').innerText = "✏️ Hariri Data";
+        document.getElementById('saveBtn').classList.add('hidden');
+        document.getElementById('updateBtn').classList.remove('hidden');
+        showTab('entry');
+    }
+
+    function updateData() {
+        let i = document.getElementById('editIndex').value;
+        let data = JSON.parse(localStorage.getItem('wifiData'));
+        data[i] = { mteja: document.getElementById('mteja').value, namba: document.getElementById('namba').value, kiasi: parseFloat(document.getElementById('kiasi').value), tarehe: data[i].tarehe };
+        localStorage.setItem('wifiData', JSON.stringify(data));
+        resetForm();
+        showTab('list');
+    }
+
+    // Messaging Functions
+    function createMsg(d) {
+        return `Habari ${d.mteja}, asante kwa kulipia huduma ya MOSHARUTH WiFi. Kiasi: Tsh ${d.kiasi.toLocaleString()}. Karibu tena!`;
+    }
+
+    function sendWA(i) {
+        let d = JSON.parse(localStorage.getItem('wifiData'))[i];
+        if(!d.namba) return alert("Huyu mteja hana namba!");
+        let cleanNamba = d.namba.startsWith('0') ? '255' + d.namba.substring(1) : d.namba;
+        window.open(`https://wa.me/${cleanNamba}?text=${encodeURIComponent(createMsg(d))}`, '_blank');
+    }
+
+    function sendSMS(i) {
+        let d = JSON.parse(localStorage.getItem('wifiData'))[i];
+        if(!d.namba) return alert("Huyu mteja hana namba!");
+        // sms:[number]?body=[message] ni standard link ya kufungua SMS app
+        window.location.href = `sms:${d.namba}?body=${encodeURIComponent(createMsg(d))}`;
+    }
+
+    // Secret Functions
+    function unlockBackup() {
+        if(document.getElementById('inputPin').value === PIN_BACKUP) {
+            document.getElementById('pin-prompt').classList.add('hidden');
+            document.getElementById('backup-content').classList.remove('hidden');
+        } else { alert("PIN Wrong!"); }
+    }
+
+    function clearAllData() {
+        if(confirm("ONYO: Hii itafuta data zote za mauzo jumla! Je, una uhakika?")) {
+            localStorage.removeItem('wifiData');
+            alert("Data zote zimefutwa!");
+            location.reload();
+        }
+    }
+
+    function generateBackup() {
+        let data = localStorage.getItem('wifiData');
+        document.getElementById('backupCode').value = btoa(unescape(encodeURIComponent(data)));
+    }
+
+    function restoreData() {
+        let code = document.getElementById('restoreInput').value;
+        try {
+            localStorage.setItem('wifiData', decodeURIComponent(escape(atob(code))));
+            alert("Success!"); location.reload();
+        } catch { alert("Invalid Code!"); }
+    }
+
+    function resetForm() {
+        ['mteja', 'namba', 'kiasi', 'editIndex'].forEach(id => document.getElementById(id).value = '');
+        document.getElementById('formTitle').innerText = "📝 Sajili Mteja";
+        document.getElementById('saveBtn').classList.remove('hidden');
+        document.getElementById('updateBtn').classList.add('hidden');
     }
 </script>
 </body>
