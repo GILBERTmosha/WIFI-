@@ -20,7 +20,8 @@
     .btn-wa{background:#25D366;color:#fff;flex:1;font-size:11px}
     .btn-sms{background:#ffffff;color:#000;flex:1;font-size:11px}
     .btn-del{background:#ef4444;color:#fff;width:40px}
-    .bulk-section{margin-top:20px; border-top: 1px solid #333; padding-top: 10px;}
+    .bulk-section{margin-top:20px; border-top: 1px solid #444; padding-top: 10px; background: #161e2e; padding: 10px; border-radius: 10px;}
+    .warning-text {color: #ff4444; font-size: 12px; font-weight: bold; display: block; margin-top: 5px;}
 </style>
 </head>
 <body>
@@ -42,14 +43,17 @@
     <button id="updateBtn" class="hidden" onclick="updateData()" style="background:orange">✅ Sahihisha</button>
 
     <div class="bulk-section">
-        <textarea id="bulkMsg" rows="2" placeholder="Andika ujumbe wa kutuma kwa wote hapa..."></textarea>
-        <button onclick="sendBulkSMS()" style="background:#4b5563; color:white;">📢 Tuma SMS kwa Wote</button>
+        <label style="font-size: 13px; color: gold;">📢 Ujumbe wa Onyo kwa Wote:</label>
+        <textarea id="bulkMsg" rows="3">ILANI: Ni marufuku kushare password 🔑 ya WiFi utakayotumiwa kwenye SMS. Ukikiuka utafungiwa huduma bila refund. Karibu MOSHARUTH WiFi.</textarea>
+        <button onclick="sendBulkSMS()" style="background:#4b5563; color:white;">🚀 Tuma Onyo kwa Wote</button>
+        <small class="warning-text">* Hii itafungua App ya SMS na namba zote za wateja.</small>
     </div>
     
     <div id="list" style="margin-top:15px">Inapakia...</div>
 </div>
 
 <script>
+// --- KONFIGARESHENI YAKO IKO HAPA ---
 const firebaseConfig = {
   apiKey: "AIzaSyDw5j_XYvLdqz7zAvJtSfOOEelfvkzjYqU",
   authDomain: "mosharuth-a466b.firebaseapp.com",
@@ -105,29 +109,28 @@ function loadData() {
     });
 }
 
-const getMsg = (name) => `Habari ${name}, Karibu MOSHARUTH WiFi.\n📶 WiFi: SMART_HOME_TZ\n🔐 Pass: goldnature55\nKaribu tena!`;
+// Ujumbe wa mteja mmoja mmoja (unabaki na maelekezo ya password)
+const getMsg = (name) => `Habari ${name}, Karibu MOSHARUTH WiFi.\n📶 WiFi: SMART_HOME_TZ\n🔐 Pass: goldnature55\n⚠️ USISHARE PASSWORD HII NA MTU MWINGINE!`;
 
-// 1. Tuma kwa mtu mmoja mmoja (Single SMS)
 function sendSMS(name, phone) {
     window.open(`sms:${phone}?body=${encodeURIComponent(getMsg(name))}`, '_blank');
 }
 
-// 2. Tuma kwa wote (Bulk SMS)
 function sendBulkSMS() {
     const customMsg = document.getElementById('bulkMsg').value;
     if(!customMsg) {
-        alert("Tafadhali andika ujumbe kwanza kwenye kisanduku!");
+        alert("Andika ujumbe kwanza!");
         return;
     }
 
     db.ref('wateja').once('value', (snap) => {
         const data = snap.val();
         if(data) {
-            // Inatengeneza list ya namba ikitenganishwa na koma
+            // Huunganisha namba zote kwa koma
             const nambaZote = Object.values(data).map(u => u.namba).join(',');
             window.open(`sms:${nambaZote}?body=${encodeURIComponent(customMsg)}`, '_blank');
         } else {
-            alert("Hakuna wateja kwenye database!");
+            alert("Database haina wateja!");
         }
     });
 }
