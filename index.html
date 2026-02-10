@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>MOSHARUTH WiFi - Lite</title>
+<title>MOSHARUTH WiFi - SMS & WA</title>
 <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
 <style>
@@ -15,10 +15,11 @@
     button{background:gold;color:#000;font-weight:bold;cursor:pointer}
     .hidden{display:none}
     .card{background:#1e293b;padding:12px;border-radius:10px;margin-top:10px;border-left:4px solid gold}
-    .flex{display:flex;gap:5px;margin-top:10px}
-    .btn-edit{background:#3b82f6;color:#fff;font-size:12px}
-    .btn-sms{background:#25D366;color:#fff;font-size:12px}
-    .btn-del{background:#ef4444;color:#fff;font-size:12px;width:50px}
+    .flex{display:flex;gap:5px;margin-top:10px;flex-wrap:wrap}
+    .btn-edit{background:#3b82f6;color:#fff;flex:1;font-size:11px}
+    .btn-wa{background:#25D366;color:#fff;flex:1;font-size:11px}
+    .btn-sms{background:#ffffff;color:#000;flex:1;font-size:11px}
+    .btn-del{background:#ef4444;color:#fff;width:40px}
 </style>
 </head>
 <body>
@@ -86,8 +87,9 @@ function loadData() {
                 <div class="card">
                     <b>${u.jina}</b> - Tsh ${u.kiasi}<br>
                     <div class="flex">
-                        <button class="btn-edit" onclick="startEdit('${key}','${u.jina}','${u.kiasi}','${u.namba}')">✏️ Edit</button>
-                        <button class="btn-sms" onclick="sendSMS('${u.jina}','${u.namba}')">💬 SMS</button>
+                        <button class="btn-edit" onclick="startEdit('${key}','${u.jina}','${u.kiasi}','${u.namba}')">Edit</button>
+                        <button class="btn-wa" onclick="sendWA('${u.jina}','${u.namba}')">WhatsApp</button>
+                        <button class="btn-sms" onclick="sendSMS('${u.jina}','${u.namba}')">SMS</button>
                         <button class="btn-del" onclick="del('${key}')">🗑️</button>
                     </div>
                 </div>`;
@@ -96,10 +98,15 @@ function loadData() {
     });
 }
 
+const getMsg = (name) => `Habari ${name}, Karibu MOSHARUTH WiFi.\n📶 WiFi: RUGI\n🔐 Pass: goldnature44\nKaribu tena!`;
+
+function sendWA(name, phone) {
+    window.open(`https://wa.me/${phone}?text=${encodeURIComponent(getMsg(name))}`, '_blank');
+}
+
 function sendSMS(name, phone) {
-    // SMS Fupi ya kawaida yenye jina la wifi na password
-    const msg = `Habari ${name}, Karibu MOSHARUTH WiFi.\n📶 WiFi: RUGI\n🔐 Pass: goldnature44\nKaribu tena!`;
-    window.open(`https://wa.me/${phone}?text=${encodeURIComponent(msg)}`, '_blank');
+    // Hii itafungua app ya SMS ya simu yako
+    window.open(`sms:${phone}?body=${encodeURIComponent(getMsg(name))}`, '_blank');
 }
 
 function startEdit(id, n, a, p) {
@@ -110,6 +117,7 @@ function startEdit(id, n, a, p) {
     document.getElementById('saveBtn').classList.add('hidden');
     document.getElementById('updateBtn').classList.remove('hidden');
     document.getElementById('title').innerText = "✏️ EDIT DATA";
+    window.scrollTo(0,0);
 }
 
 function updateData() {
