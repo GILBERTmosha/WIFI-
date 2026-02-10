@@ -1,187 +1,128 @@
 <!DOCTYPE html>
 <html lang="sw">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MOSHARUTA WiFi - Multi-Device Sync</title>
-    <style>
-        :root { --primary: #22d3ee; --bg: #0f172a; --card: #1e293b; --danger: #f43f5e; --success: #10b981; }
-        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: #f8fafc; margin: 0; padding: 10px; }
-        .container { max-width: 500px; margin: auto; background: var(--card); padding: 20px; border-radius: 20px; border: 1px solid #334155; }
-        .hidden { display: none; }
-        .menu { display: flex; justify-content: space-around; margin-bottom: 20px; border-bottom: 2px solid #334155; }
-        .menu button { background: none; border: none; color: #94a3b8; padding: 10px; cursor: pointer; font-weight: bold; font-size: 11px; }
-        .menu button.active { color: var(--primary); border-bottom: 3px solid var(--primary); }
-        input, textarea { width: 100%; padding: 12px; margin: 8px 0; border-radius: 10px; border: 1px solid #334155; background: #0f172a; color: white; box-sizing: border-box; }
-        .btn { width: 100%; padding: 12px; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; margin-top: 5px; }
-        .btn-save { background: var(--success); color: white; }
-        table { width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 10px; }
-        th, td { padding: 8px; text-align: left; border-bottom: 1px solid #334155; }
-        .backup-area { background: #020617; padding: 15px; border-radius: 15px; border: 1px dashed var(--primary); margin-top: 20px; }
-        .copy-box { background: #1e293b; padding: 10px; font-size: 10px; overflow-wrap: break-word; color: #34d399; margin-bottom: 10px; border-radius: 5px; max-height: 100px; overflow-y: auto; }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MOSHARUTH WiFi - Cloud Live</title>
+
+<script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
+
+<style>
+body{font-family:Arial,sans-serif;background:#0f172a;color:#fff;margin:0;padding:10px}
+.container{max-width:400px;margin:auto;background:#111;padding:20px;border-radius:15px;box-shadow:0 0 20px gold}
+h2{text-align:center;color:gold;margin-bottom:20px}
+input,button{width:100%;padding:12px;margin-top:10px;border-radius:8px;border:none;box-sizing:border-box}
+input{background:#222;color:white;border:1px solid #333}
+button{background:gold;color:black;font-weight:bold;cursor:pointer;font-size:16px}
+.hidden{display:none}
+.card{background:#1e293b;padding:15px;border-radius:10px;margin-top:15px;border-left:5px solid gold}
+.flex{display:flex;gap:10px;margin-top:10px}
+.delete-btn{background:#ef4444;color:white;padding:5px 10px;border-radius:5px}
+</style>
 </head>
 <body>
 
-<div class="container">
-    <div id="login-section">
-        <h2 style="text-align:center">📡 MOSHARUTA SYNC</h2>
-        <input type="email" id="emailIn" placeholder="Email yako">
-        <input type="password" id="passIn" placeholder="Password">
-        <button class="btn btn-save" onclick="handleLogin()">INGIA</button>
-    </div>
+<div id="loginSection" class="container">
+    <h2>🔐 MOSHARUTH LOGIN</h2>
+    <input type="password" id="passInput" placeholder="Ingiza Password">
+    <button onclick="checkLogin()">Ingia</button>
+</div>
 
-    <div id="main-content" class="hidden">
-        <div class="menu">
-            <button id="tab1" class="active" onclick="switchTab('calc')">CALC</button>
-            <button id="tab2" onclick="switchTab('entry')">SAJILI</button>
-            <button id="tab3" onclick="switchTab('list')">MAUZO</button>
-            <button id="tab4" class="hidden" onclick="switchTab('admin')">ADMIN</button>
-        </div>
-
-        <div id="calc-section">
-            <input type="text" id="display" style="text-align:right; font-size:24px;" placeholder="0" readonly>
-            <div style="display:grid; grid-template-columns: repeat(4, 1fr); gap:8px;">
-                <button class="btn" onclick="clearC()" style="background:#ef4444">C</button>
-                <button class="btn" onclick="press('/')" style="background:#334155">/</button>
-                <button class="btn" onclick="press('*')" style="background:#334155">×</button>
-                <button class="btn" onclick="press('-')" style="background:#334155">-</button>
-                <button class="btn" onclick="press('7')" style="background:#475569">7</button>
-                <button class="btn" onclick="press('8')" style="background:#475569">8</button>
-                <button class="btn" onclick="press('9')" style="background:#475569">9</button>
-                <button class="btn" onclick="press('+')" style="background:#334155">+</button>
-                <button class="btn" onclick="calcResult()" style="background:var(--success); grid-row: span 3">=</button>
-                <button class="btn" onclick="press('4')" style="background:#475569">4</button>
-                <button class="btn" onclick="press('5')" style="background:#475569">5</button>
-                <button class="btn" onclick="press('6')" style="background:#475569">6</button>
-                <button class="btn" onclick="press('1')" style="background:#475569">1</button>
-                <button class="btn" onclick="press('2')" style="background:#475569">2</button>
-                <button class="btn" onclick="press('3')" style="background:#475569">3</button>
-                <button class="btn" onclick="press('0')" style="grid-column: span 2; background:#475569">0</button>
-                <button class="btn" onclick="press('.')" style="background:#475569">.</button>
-            </div>
-        </div>
-
-        <div id="entry-section" class="hidden">
-            <h3>📝 Sajili Mauzo</h3>
-            <input type="text" id="mName" placeholder="Jina la Mteja">
-            <input type="number" id="mAmount" placeholder="Kiasi (Tsh)">
-            <button class="btn btn-save" onclick="saveRecord()">HIFADHI</button>
-        </div>
-
-        <div id="list-section" class="hidden">
-            <h4>Mauzo Yako</h4>
-            <div id="userList"></div>
-            
-            <div class="backup-area">
-                <p style="font-size:12px; color:var(--primary); font-weight:bold;">📲 HAMISHA DATA KWENDA SIMU NYINGINE</p>
-                <div id="copyBox" class="copy-box">Code itatokea hapa...</div>
-                <button class="btn" style="background:#334155; font-size:11px;" onclick="generateExportCode()">1. TENGENEZA CODE YA KUHAMISHA</button>
-                <hr style="border:0.5px solid #334155; margin:15px 0;">
-                <textarea id="importCode" placeholder="Paste code hapa kutoka simu nyingine..." rows="3"></textarea>
-                <button class="btn" style="background:var(--primary); color:black; font-size:11px;" onclick="importData()">2. RUDISHA DATA KWA CODE HII</button>
-            </div>
-        </div>
-
-        <div id="admin-section" class="hidden">
-            <h3>👑 Admin View</h3>
-            <div id="adminData"></div>
-        </div>
-
-        <button class="btn" style="background:#475569; margin-top:20px" onclick="location.reload()">LOGOUT</button>
-    </div>
+<div id="mainSection" class="container hidden">
+    <h2>📡 MOSHARUTH WiFi</h2>
+    <input type="text" id="custName" placeholder="Jina la Mteja">
+    <input type="number" id="custAmount" placeholder="Kiasi (Tsh)">
+    <input type="tel" id="custPhone" placeholder="Namba ya Simu">
+    <button onclick="saveData()">💾 Hifadhi Mtandaoni</button>
+    
+    <div id="customerList">Pakia data...</div>
 </div>
 
 <script>
-    const ADM_E = "kingshamo47@gmail.com";
-    const ADM_P = "2007+";
-    const USR_P = "MOSHA";
-    let currentUser = "";
+// Zile kodi zako za Firebase
+const firebaseConfig = {
+  apiKey: "AIzaSyDw5j_XYvLdqz7zAvJtSfOOEelfvkzjYqU",
+  authDomain: "mosharuth-a466b.firebaseapp.com",
+  databaseURL: "https://mosharuth-a466b-default-rtdb.firebaseio.com",
+  projectId: "mosharuth-a466b",
+  storageBucket: "mosharuth-a466b.firebasestorage.app",
+  messagingSenderId: "571128004354",
+  appId: "1:571128004354:web:3318c5239e2afb6644cc1b"
+};
 
-    function handleLogin() {
-        let e = document.getElementById('emailIn').value.trim();
-        let p = document.getElementById('passIn').value.trim();
-        if(e === ADM_E && p === ADM_P) { currentUser = e; document.getElementById('tab4').classList.remove('hidden'); }
-        else if(e && p === USR_P) { currentUser = e; }
-        else { return alert("Login imekataa!"); }
-        document.getElementById('login-section').classList.add('hidden');
-        document.getElementById('main-content').classList.remove('hidden');
-        switchTab('calc');
+// Start Firebase
+firebase.initializeApp(firebaseConfig);
+const database = firebase.database();
+
+// Login Function
+function checkLogin() {
+    if(document.getElementById('passInput').value === "goldnature44") {
+        document.getElementById('loginSection').classList.add('hidden');
+        document.getElementById('mainSection').classList.remove('hidden');
+        loadData();
+    } else {
+        alert("❌ Password Sio Sahihi!");
     }
+}
 
-    function switchTab(t) {
-        ['calc-section', 'entry-section', 'list-section', 'admin-section'].forEach(s => document.getElementById(s).classList.add('hidden'));
-        document.getElementById(t + '-section').classList.remove('hidden');
-        if(t === 'list') renderUserList();
-        if(t === 'admin') renderAdminView();
-    }
+// Save Data Function
+function saveData() {
+    const name = document.getElementById('custName').value;
+    const amount = document.getElementById('custAmount').value;
+    const phone = document.getElementById('custPhone').value;
 
-    let expr = "";
-    function press(v) { expr += v; document.getElementById('display').value = expr; }
-    function clearC() { expr = ""; document.getElementById('display').value = ""; }
-    function calcResult() { try { expr = eval(expr).toString(); document.getElementById('display').value = expr; } catch { clearC(); } }
-
-    function saveRecord() {
-        let m = document.getElementById('mName').value, a = document.getElementById('mAmount').value;
-        if(!m || !a) return alert("Jaza Jina na Kiasi!");
-        let db = JSON.parse(localStorage.getItem('mosha_v9')) || [];
-        db.push({ u: currentUser, mteja: m, kiasi: parseFloat(a), date: new Date().toLocaleString() });
-        localStorage.setItem('mosha_v9', JSON.stringify(db));
-        alert("Imetunzwa!");
-        document.getElementById('mName').value = ''; document.getElementById('mAmount').value = '';
-        switchTab('list');
-    }
-
-    function renderUserList() {
-        let db = JSON.parse(localStorage.getItem('mosha_v9')) || [];
-        let myData = db.filter(x => x.u === currentUser);
-        let h = "<table><tr><th>Mteja</th><th>Tsh</th></tr>";
-        myData.forEach(d => { h += `<tr><td>${d.mteja}</td><td>${d.kiasi.toLocaleString()}</td></tr>`; });
-        document.getElementById('userList').innerHTML = h + "</table>";
-    }
-
-    function renderAdminView() {
-        let db = JSON.parse(localStorage.getItem('mosha_v9')) || [];
-        let h = "<table><tr><th>User</th><th>Mteja</th><th>Tsh</th></tr>";
-        db.forEach(d => { h += `<tr><td>${d.u.split('@')[0]}</td><td>${d.mteja}</td><td>${d.kiasi.toLocaleString()}</td></tr>`; });
-        document.getElementById('adminData').innerHTML = h + "</table>";
-    }
-
-    // --- Mfumo wa Kuhamisha Data (Simu kwa Simu) ---
-    function generateExportCode() {
-        let db = localStorage.getItem('mosha_v9');
-        if(!db || db === "[]") return alert("Hakuna data za kuhamisha!");
-        
-        // Tunageuza data kuwa string ambayo unaweza ku-copy
-        let exportData = btoa(unescape(encodeURIComponent(db))); 
-        document.getElementById('copyBox').innerText = exportData;
-        
-        // Rahisisha kwa ku-copy moja kwa moja
-        navigator.clipboard.writeText(exportData).then(() => {
-            alert("Code imetengenezwa na imekuwa Copied! Sasa itume WhatsApp kwenda simu nyingine.");
+    if(name && amount && phone) {
+        database.ref('wateja').push({
+            jina: name,
+            kiasi: amount,
+            namba: phone,
+            muda: new Date().toLocaleString('sw-TZ')
         });
+        // Clear Inputs
+        document.getElementById('custName').value = "";
+        document.getElementById('custAmount').value = "";
+        document.getElementById('custPhone').value = "";
+    } else {
+        alert("⚠️ Tafadhali jaza nafasi zote!");
     }
+}
 
-    function importData() {
-        let code = document.getElementById('importCode').value.trim();
-        if(!code) return alert("Paste code hapa kwanza!");
+// Load Data in Realtime
+function loadData() {
+    database.ref('wateja').on('value', (snapshot) => {
+        const listDiv = document.getElementById('customerList');
+        listDiv.innerHTML = "";
+        const data = snapshot.val();
         
-        try {
-            let decodedData = decodeURIComponent(escape(atob(code)));
-            let parsed = JSON.parse(decodedData);
-            
-            if(confirm("Je, unataka kuongeza data hizi kwenye simu hii?")) {
-                let existingDb = JSON.parse(localStorage.getItem('mosha_v9')) || [];
-                let finalDb = [...existingDb, ...parsed]; // Inaunganisha data za zamani na mpya
-                localStorage.setItem('mosha_v9', JSON.stringify(finalDb));
-                alert("Data zimehamishwa kikamilifu!");
-                renderUserList();
-                document.getElementById('importCode').value = "";
-            }
-        } catch(e) {
-            alert("Code siyo sahihi! Hakikisha ume-copy code yote uliyotengeneza kwenye simu ya kwanza.");
+        if(data) {
+            Object.keys(data).reverse().forEach(key => {
+                const user = data[key];
+                listDiv.innerHTML += `
+                    <div class="card">
+                        <b>👤 ${user.jina}</b><br>
+                        💰 Tsh ${user.kiasi}<br>
+                        📞 ${user.namba}<br>
+                        <small>📅 ${user.muda}</small><br>
+                        <div class="flex">
+                            <button onclick="window.open('https://wa.me/${user.namba}')" style="background:#25D366;color:white">WhatsApp</button>
+                            <button class="delete-btn" onclick="deleteCustomer('${key}')">Futa</button>
+                        </div>
+                    </div>
+                `;
+            });
+        } else {
+            listDiv.innerHTML = "<p style='text-align:center'>Hakuna data bado.</p>";
         }
+    });
+}
+
+function deleteCustomer(id) {
+    if(confirm("Je, una uhakika unataka kufuta?")) {
+        database.ref('wateja/' + id).remove();
     }
+}
 </script>
+
 </body>
 </html>
