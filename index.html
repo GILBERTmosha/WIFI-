@@ -10,8 +10,8 @@
     body{font-family:sans-serif;background:#0f172a;color:#fff;margin:0;padding:15px}
     .container{max-width:400px;margin:auto;background:#111;padding:20px;border-radius:15px;box-shadow:0 0 15px gold}
     h2{text-align:center;color:gold;margin-top:0}
-    input,button{width:100%;padding:12px;margin-top:10px;border-radius:8px;border:none;box-sizing:border-box}
-    input{background:#222;color:#fff;border:1px solid #333}
+    input, textarea, button{width:100%;padding:12px;margin-top:10px;border-radius:8px;border:none;box-sizing:border-box}
+    input, textarea{background:#222;color:#fff;border:1px solid #333}
     button{background:gold;color:#000;font-weight:bold;cursor:pointer}
     .hidden{display:none}
     .card{background:#1e293b;padding:12px;border-radius:10px;margin-top:10px;border-left:4px solid gold}
@@ -20,6 +20,7 @@
     .btn-wa{background:#25D366;color:#fff;flex:1;font-size:11px}
     .btn-sms{background:#ffffff;color:#000;flex:1;font-size:11px}
     .btn-del{background:#ef4444;color:#fff;width:40px}
+    .bulk-section{margin-top:20px; border-top: 1px solid #333; padding-top: 10px;}
 </style>
 </head>
 <body>
@@ -32,12 +33,18 @@
 
 <div id="appBox" class="container hidden">
     <h2 id="title">📡 MOSHARUTH</h2>
+    
     <input type="text" id="name" placeholder="Jina la mteja">
     <input type="number" id="amount" placeholder="Kiasi (Tsh)">
     <input type="tel" id="phone" placeholder="Namba ya simu">
     
     <button id="saveBtn" onclick="saveData()">💾 Hifadhi Cloud</button>
     <button id="updateBtn" class="hidden" onclick="updateData()" style="background:orange">✅ Sahihisha</button>
+
+    <div class="bulk-section">
+        <textarea id="bulkMsg" rows="2" placeholder="Andika ujumbe wa kutuma kwa wote hapa..."></textarea>
+        <button onclick="sendBulkSMS()" style="background:#4b5563; color:white;">📢 Tuma SMS kwa Wote</button>
+    </div>
     
     <div id="list" style="margin-top:15px">Inapakia...</div>
 </div>
@@ -100,13 +107,33 @@ function loadData() {
 
 const getMsg = (name) => `Habari ${name}, Karibu MOSHARUTH WiFi.\n📶 WiFi: SMART_HOME_TZ\n🔐 Pass: goldnature55\nKaribu tena!`;
 
-function sendWA(name, phone) {
-    window.open(`https://wa.me/${phone}?text=${encodeURIComponent(getMsg(name))}`, '_blank');
+// 1. Tuma kwa mtu mmoja mmoja (Single SMS)
+function sendSMS(name, phone) {
+    window.open(`sms:${phone}?body=${encodeURIComponent(getMsg(name))}`, '_blank');
 }
 
-function sendSMS(name, phone) {
-    // Hii itafungua app ya SMS ya simu yako
-    window.open(`sms:${phone}?body=${encodeURIComponent(getMsg(name))}`, '_blank');
+// 2. Tuma kwa wote (Bulk SMS)
+function sendBulkSMS() {
+    const customMsg = document.getElementById('bulkMsg').value;
+    if(!customMsg) {
+        alert("Tafadhali andika ujumbe kwanza kwenye kisanduku!");
+        return;
+    }
+
+    db.ref('wateja').once('value', (snap) => {
+        const data = snap.val();
+        if(data) {
+            // Inatengeneza list ya namba ikitenganishwa na koma
+            const nambaZote = Object.values(data).map(u => u.namba).join(',');
+            window.open(`sms:${nambaZote}?body=${encodeURIComponent(customMsg)}`, '_blank');
+        } else {
+            alert("Hakuna wateja kwenye database!");
+        }
+    });
+}
+
+function sendWA(name, phone) {
+    window.open(`https://wa.me/${phone}?text=${encodeURIComponent(getMsg(name))}`, '_blank');
 }
 
 function startEdit(id, n, a, p) {
