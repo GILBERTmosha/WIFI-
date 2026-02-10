@@ -3,47 +3,45 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>MOSHARUTH WiFi - Edit & SMS</title>
+<title>MOSHARUTH WiFi - Lite</title>
 <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
 <style>
-body{font-family:Arial,sans-serif;background:#0f172a;color:#fff;margin:0;padding:10px}
-.container{max-width:400px;margin:auto;background:#111;padding:20px;border-radius:15px;box-shadow:0 0 20px gold}
-h2{text-align:center;color:gold}
-input,button{width:100%;padding:12px;margin-top:10px;border-radius:8px;border:none;box-sizing:border-box}
-input{background:#222;color:white;border:1px solid #333}
-button{background:gold;color:black;font-weight:bold;cursor:pointer}
-.hidden{display:none}
-.card{background:#1e293b;padding:12px;border-radius:10px;margin-top:10px;border-left:5px solid gold}
-.flex{display:flex;gap:5px;margin-top:8px}
-.edit-btn{background:#3b82f6;color:white}
-.sms-btn{background:#25D366;color:white}
-.del-btn{background:#ef4444;color:white}
+    body{font-family:sans-serif;background:#0f172a;color:#fff;margin:0;padding:15px}
+    .container{max-width:400px;margin:auto;background:#111;padding:20px;border-radius:15px;box-shadow:0 0 15px gold}
+    h2{text-align:center;color:gold;margin-top:0}
+    input,button{width:100%;padding:12px;margin-top:10px;border-radius:8px;border:none;box-sizing:border-box}
+    input{background:#222;color:#fff;border:1px solid #333}
+    button{background:gold;color:#000;font-weight:bold;cursor:pointer}
+    .hidden{display:none}
+    .card{background:#1e293b;padding:12px;border-radius:10px;margin-top:10px;border-left:4px solid gold}
+    .flex{display:flex;gap:5px;margin-top:10px}
+    .btn-edit{background:#3b82f6;color:#fff;font-size:12px}
+    .btn-sms{background:#25D366;color:#fff;font-size:12px}
+    .btn-del{background:#ef4444;color:#fff;font-size:12px;width:50px}
 </style>
 </head>
 <body>
 
-<div id="loginSection" class="container">
+<div id="loginBox" class="container">
     <h2>🔐 LOGIN</h2>
-    <input type="password" id="passInput" placeholder="Password">
-    <button onclick="checkLogin()">Ingia</button>
+    <input type="password" id="passInput" placeholder="Ingiza Password">
+    <button onclick="login()">Ingia</button>
 </div>
 
-<div id="mainSection" class="container hidden">
-    <h2 id="formTitle">📡 SAJILI MTEJA</h2>
-    <input type="text" id="custName" placeholder="Jina">
-    <input type="number" id="custAmount" placeholder="Kiasi">
-    <input type="tel" id="custPhone" placeholder="Namba">
+<div id="appBox" class="container hidden">
+    <h2 id="title">📡 MOSHARUTH</h2>
+    <input type="text" id="name" placeholder="Jina la mteja">
+    <input type="number" id="amount" placeholder="Kiasi (Tsh)">
+    <input type="tel" id="phone" placeholder="Namba ya simu">
     
     <button id="saveBtn" onclick="saveData()">💾 Hifadhi Cloud</button>
-    <button id="updateBtn" class="hidden" onclick="updateData()" style="background:orange">✏️ Sahihisha (Update)</button>
-    <button id="cancelBtn" class="hidden" onclick="cancelEdit()" style="background:#444;color:white">X Ghairi</button>
+    <button id="updateBtn" class="hidden" onclick="updateData()" style="background:orange">✅ Sahihisha</button>
     
-    <div id="customerList" style="margin-top:15px">Pakia data...</div>
+    <div id="list" style="margin-top:15px">Inapakia...</div>
 </div>
 
 <script>
-// Kodi zako za Firebase
 const firebaseConfig = {
   apiKey: "AIzaSyDw5j_XYvLdqz7zAvJtSfOOEelfvkzjYqU",
   authDomain: "mosharuth-a466b.firebaseapp.com",
@@ -55,42 +53,42 @@ const firebaseConfig = {
 };
 
 firebase.initializeApp(firebaseConfig);
-const database = firebase.database();
+const db = firebase.database();
 let editId = null;
 
-function checkLogin() {
+function login() {
     if(document.getElementById('passInput').value === "goldnature44") {
-        document.getElementById('loginSection').classList.add('hidden');
-        document.getElementById('mainSection').classList.remove('hidden');
+        document.getElementById('loginBox').classList.add('hidden');
+        document.getElementById('appBox').classList.remove('hidden');
         loadData();
-    } else { alert("❌ Password Sio Sahihi!"); }
+    } else { alert("Password sio sahihi!"); }
 }
 
 function saveData() {
-    const name = document.getElementById('custName').value;
-    const amount = document.getElementById('custAmount').value;
-    const phone = document.getElementById('custPhone').value;
-    if(name && amount && phone) {
-        database.ref('wateja').push({ jina: name, kiasi: amount, namba: phone });
-        clearForm();
+    const n = document.getElementById('name').value;
+    const a = document.getElementById('amount').value;
+    const p = document.getElementById('phone').value;
+    if(n && a && p) {
+        db.ref('wateja').push({ jina: n, kiasi: a, namba: p });
+        clear();
     }
 }
 
 function loadData() {
-    database.ref('wateja').on('value', (snapshot) => {
-        const listDiv = document.getElementById('customerList');
-        listDiv.innerHTML = "";
-        const data = snapshot.val();
+    db.ref('wateja').on('value', (snap) => {
+        const list = document.getElementById('list');
+        list.innerHTML = "";
+        const data = snap.val();
         if(data) {
             Object.keys(data).reverse().forEach(key => {
                 const u = data[key];
-                listDiv.innerHTML += `
+                list.innerHTML += `
                 <div class="card">
                     <b>${u.jina}</b> - Tsh ${u.kiasi}<br>
                     <div class="flex">
-                        <button class="edit-btn" onclick="startEdit('${key}', '${u.jina}', '${u.kiasi}', '${u.namba}')">✏️ Edit</button>
-                        <button class="sms-btn" onclick="sendShortSMS('${u.jina}', '${u.namba}')">💬 SMS</button>
-                        <button class="del-btn" onclick="deleteCust('${key}')">🗑️</button>
+                        <button class="btn-edit" onclick="startEdit('${key}','${u.jina}','${u.kiasi}','${u.namba}')">✏️ Edit</button>
+                        <button class="btn-sms" onclick="sendSMS('${u.jina}','${u.namba}')">💬 SMS</button>
+                        <button class="btn-del" onclick="del('${key}')">🗑️</button>
                     </div>
                 </div>`;
             });
@@ -98,50 +96,37 @@ function loadData() {
     });
 }
 
-// Sehemu ya EDIT
-function startEdit(id, name, amount, phone) {
+function sendSMS(name, phone) {
+    // SMS Fupi ya kawaida yenye jina la wifi na password
+    const msg = `Habari ${name}, Karibu MOSHARUTH WiFi.\n📶 WiFi: RUGI\n🔐 Pass: goldnature44\nKaribu tena!`;
+    window.open(`https://wa.me/${phone}?text=${encodeURIComponent(msg)}`, '_blank');
+}
+
+function startEdit(id, n, a, p) {
     editId = id;
-    document.getElementById('custName').value = name;
-    document.getElementById('custAmount').value = amount;
-    document.getElementById('custPhone').value = phone;
-    document.getElementById('formTitle').innerText = "✏️ SAHIHISHA DATA";
+    document.getElementById('name').value = n;
+    document.getElementById('amount').value = a;
+    document.getElementById('phone').value = p;
     document.getElementById('saveBtn').classList.add('hidden');
     document.getElementById('updateBtn').classList.remove('hidden');
-    document.getElementById('cancelBtn').classList.remove('hidden');
+    document.getElementById('title').innerText = "✏️ EDIT DATA";
 }
 
 function updateData() {
-    if(editId) {
-        database.ref('wateja/' + editId).update({
-            jina: document.getElementById('custName').value,
-            kiasi: document.getElementById('custAmount').value,
-            namba: document.getElementById('custPhone').value
-        });
-        cancelEdit();
-    }
-}
-
-function cancelEdit() {
+    db.ref('wateja/' + editId).update({
+        jina: document.getElementById('name').value,
+        kiasi: document.getElementById('amount').value,
+        namba: document.getElementById('phone').value
+    });
     editId = null;
-    clearForm();
-    document.getElementById('formTitle').innerText = "📡 SAJILI MTEJA";
     document.getElementById('saveBtn').classList.remove('hidden');
     document.getElementById('updateBtn').classList.add('hidden');
-    document.getElementById('cancelBtn').classList.add('hidden');
+    document.getElementById('title').innerText = "📡 MOSHARUTH";
+    clear();
 }
 
-// SMS FUPI
-function sendShortSMS(name, phone) {
-    const text = `Habari ${name}, Karibu MOSHARUTH WiFi. Username: RUGI, Pass: goldnature44. Karibu tena!`;
-    window.open(`https://wa.me/${phone}?text=${encodeURIComponent(text)}`, '_blank');
-}
-
-function deleteCust(id) { if(confirm("Futa?")) database.ref('wateja/' + id).remove(); }
-function clearForm() { 
-    document.getElementById('custName').value=""; 
-    document.getElementById('custAmount').value=""; 
-    document.getElementById('custPhone').value=""; 
-}
+function del(id) { if(confirm("Futa?")) db.ref('wateja/' + id).remove(); }
+function clear() { document.getElementById('name').value=""; document.getElementById('amount').value=""; document.getElementById('phone').value=""; }
 </script>
 </body>
 </html>
